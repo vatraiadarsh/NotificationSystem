@@ -1,0 +1,39 @@
+version: '3.4'
+
+services:
+  notification:
+    image: ${DOCKER_REGISTRY-}notification
+    build:
+      context: .
+      dockerfile: Notification/Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - db
+
+  rabbitmq:
+    image: rabbitmq:management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+      
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    user: root
+    environment:
+      - SA_PASSWORD=strongP@ssw0rd
+      - ACCEPT_EULA=Y
+    ports:
+      - "1433:1433"
+    volumes:
+      - db-data:/var/opt/mssql/data
+
+volumes:
+  db-data:
+    driver: local
+
+
+
